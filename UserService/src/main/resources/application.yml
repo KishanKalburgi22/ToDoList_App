@@ -1,0 +1,59 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://database-1.cuy0nbf4l2um.ap-south-1.rds.amazonaws.com:5432/userservice
+    username: postgres
+    password: 123456789
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  application:
+    name: User-Service
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      taskServiceBreaker:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 6s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+#logging:
+#  level:
+#    root: DEBUG
+#    org.apache.http: DEBUG
+#    org.springframework.web.client.RestTemplate: DEBUG
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

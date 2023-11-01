@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+
+      routes:
+        - id: ToDoList-WriteOnly
+          uri: lb://ToDoList-WriteOnly
+          predicates:
+            - Path=/todolist/api/v1/writeonly/user/**
+        - id: ToDoList-ReadOnly
+          uri: lb://ToDoList-ReadOnly
+          predicates:
+            - Path=/todolist/api/v1/readonly/user/**
+        - id: User-Service
+          uri: lb://User-Service
+          predicates:
+            - Path=/users/**
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
